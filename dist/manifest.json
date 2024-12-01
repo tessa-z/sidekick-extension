@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
   "manifest_version": 3,
-  "name": "React Chrome Extension",
-  "description": "This is a Chrome extension built with React and TypeScript",
+  "name": "Sidekick Extension",
+  "description": "Stop opening new tabs and search right here!",
   "action": {
-      "default_title": "React Chrome Extension"
+      "default_title": "Sidekick Extension"
   },
   "permissions": [
     "sidePanel"

@@ -1,7 +1,9 @@
+import ChatScreen from "./ChatScreen";
+
 function App() {
   return (
     <div className="App">
-      Hello World
+      <ChatScreen/>
     </div>
   );
 }
