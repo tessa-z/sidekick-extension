@@ -15,6 +15,10 @@
     "http://*/*",
     "https://*/*"
   ],
+  "background": {
+    "service_worker": "js/service-worker.js",
+    "type": "module"
+  },
   "side_panel": {
     "default_path": "js/index.html"
   }

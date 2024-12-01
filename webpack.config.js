@@ -1,11 +1,12 @@
 const path = require("path");
 const HTMLPlugin = require("html-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
-const Dotenv = require("dotenv-webpack"); // Import the dotenv-webpack plugin
+const Dotenv = require("dotenv-webpack");
 
 module.exports = {
     entry: {
-        index: "./src/index.tsx"
+        index: "./src/index.tsx",
+        'service-worker': "./src/service-worker.js" // Add service worker entry
     },
     mode: "production",
     module: {
@@ -39,7 +40,7 @@ module.exports = {
             ],
         }),
         ...getHtmlPlugins(["index"]),
-        new Dotenv(), // Add the dotenv plugin here to load environment variables
+        new Dotenv(),
     ],
     resolve: {
         extensions: [".tsx", ".ts", ".js"],
