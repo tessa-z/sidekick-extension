@@ -6,7 +6,7 @@ const Dotenv = require("dotenv-webpack");
 module.exports = {
     entry: {
         index: "./src/index.tsx",
-        'service-worker': "./src/service-worker.js" // Add service worker entry
+        'service-worker': "./src/service-worker.js"
     },
     mode: "production",
     module: {
