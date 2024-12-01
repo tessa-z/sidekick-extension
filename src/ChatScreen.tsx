@@ -11,6 +11,7 @@ function ChatScreen() {
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const tab_url = useActiveTabUrl();
+  const [prompt, setPrompt] = useState<string>("Hello! Quote a line from content you just read.")
 
   const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -20,9 +21,11 @@ function ChatScreen() {
     systemInstruction: `Read this content: "${content}". Greet the user cheerfully to start. Suggest the user ask about any topics related to this page. For following messages, answer in less than 200 words. Use easy to understand languages and analogies to help you explain.`,
   });
 
-  const handleClick = async () => {
-    const prompt = "Hello! Quote sentence from the content you have read.";
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPrompt(event.target.value); // Update state with input value
+  };
 
+  const handleClick = async () => {
     const result = await model.generateContent(prompt);
     console.log(result.response.text());
 
@@ -66,7 +69,7 @@ function ChatScreen() {
   return (
     <div>
       Answer: {data}
-      <TextField id="outlined-basic" label="Outlined" variant="outlined" />
+      <TextField id="outlined-basic" label="Outlined" variant="outlined" onChange={handleChange}/>
       <Button variant="contained" onClick={handleClick}>
         Send
       </Button>
