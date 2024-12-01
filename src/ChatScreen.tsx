@@ -19,7 +19,7 @@ function ChatScreen() {
         const result = await model.generateContent(prompt);
         console.log(result.response.text());
 
-        setData(result.message);
+        setData(result.response.text());
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {

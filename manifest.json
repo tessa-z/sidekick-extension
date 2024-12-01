@@ -7,7 +7,13 @@
       "default_title": "Sidekick Extension"
   },
   "permissions": [
-    "sidePanel"
+    "sidePanel",
+    "tabs",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
   ],
   "side_panel": {
     "default_path": "js/index.html"
