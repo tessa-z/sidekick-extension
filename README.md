@@ -19,6 +19,7 @@ Go to
 chrome://extensions/
 ```
 Click on "Load unpacked"
-Select the dist folder > Ok
-The extension should be added!
+Select the dist folder > Ok.
+
+The extension is added!
 
