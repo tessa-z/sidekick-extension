@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
   "manifest_version": 3,
-  "name": "Sidekick Extension",
-  "description": "Stop opening new tabs and search right here!",
+  "name": "Gemini for Chrome+",
+  "description": "New tabs a mess? Use Gemini for Chrome+!",
   "action": {
-      "default_title": "Sidekick Extension"
+      "default_title": "Gemini for Chrome+"
   },
   "permissions": [
     "sidePanel",

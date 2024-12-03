@@ -1,11 +1,10 @@
 .App {
-  color: black;
+  color: 006879;
   text-align: center;
 }
 
 .container {
   width: 20rem;
-  height: 20rem;
-  background-color: rgb(162, 231, 87);
-
+  height: 28rem;
+  background-color: #F5FAFC;
 }

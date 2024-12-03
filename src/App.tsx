@@ -1,10 +1,11 @@
+import { Grid2 } from "@mui/material";
 import ChatScreen from "./ChatScreen";
 
 function App() {
   return (
-    <div className="App">
+    <Grid2 height={700}>
       <ChatScreen/>
-    </div>
+    </Grid2>
   );
 }
 
