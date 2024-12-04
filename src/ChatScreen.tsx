@@ -1,39 +1,97 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useActiveTabUrl } from "./hooks/useActiveUrl";
-import { tab } from "@testing-library/user-event/dist/tab";
 import TextField from "@mui/material/TextField";
 import { Box, Button, Grid2, Icon, Stack } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 
-const apiKey = process.env.GEMINI_API_KEY;
+interface SummarizerResult {
+  summary: string | null;
+  loading: boolean;
+  error: string | null;
+}
+
+type SummarizeFunction = (text: string) => Promise<void>;
+
+const useChromeSummarizer = (): [SummarizerResult, SummarizeFunction] => {
+  const [state, setState] = useState<SummarizerResult>({
+    summary: null,
+    loading: false,
+    error: null,
+  });
+
+  const summarizeText: SummarizeFunction = useCallback(async (text: string) => {
+    setState(prev => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      
+      registration.active?.postMessage({
+        type: 'SUMMARIZE_REQUEST',
+        text: text,
+      });
+    } catch (error) {
+      setState({
+        summary: null,
+        loading: false,
+        error: 'Failed to communicate with service worker',
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'SUMMARIZE_RESULT') {
+        setState({
+          summary: event.data.summary,
+          loading: false,
+          error: null,
+        });
+      } else if (event.data.type === 'SUMMARIZE_ERROR') {
+        setState({
+          summary: null,
+          loading: false,
+          error: event.data.error,
+        });
+      }
+    };
+
+    navigator.serviceWorker.addEventListener('message', handleMessage);
+
+    return () => {
+      navigator.serviceWorker.removeEventListener('message', handleMessage);
+    };
+  }, []);
+
+  return [state, summarizeText];
+};
 
 function ChatScreen() {
-  const [data, setData] = useState<string | null>(null);
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const tab_url = useActiveTabUrl();
   const [prompt, setPrompt] = useState<string>(
     "Hello! Quote a line from content you just read."
   );
+  const [{ summary, loading: summaryLoading, error: summaryError }, summarize] = useChromeSummarizer();
 
-  const { GoogleGenerativeAI } = require("@google/generative-ai");
-
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    systemInstruction: `Read this content: "${content}". Greet the user cheerfully to start, providing a summary of 3 specific key points from the content. Suggest related topics the user may be interested in from this content. Answer in less than 300 words. You may use broken sentences and pointers to make it information compact. Use easy to understand languages and analogies to help you explain.`,
-  });
+  // Register service worker on component mount
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => console.log('ServiceWorker registration successful'))
+        .catch(err => console.log('ServiceWorker registration failed: ', err));
+    }
+  }, []);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPrompt(event.target.value); // Update state with input value
+    setPrompt(event.target.value);
   };
 
   const handleClick = async () => {
-    const result = await model.generateContent(prompt);
-    console.log(result.response.text());
-
-    setData(result.response.text());
-    alert("clicked");
+    if (content) {
+      await summarize(content);
+    }
+    alert('clicked');
   };
 
   useEffect(() => {
@@ -72,7 +130,9 @@ function ChatScreen() {
       <Stack padding={2}>
         Gemini for Chrome+
         <Box padding={2} width={3 / 4}>
-          <ReactMarkdown>{data}</ReactMarkdown>
+          {summaryLoading && <div>Summarizing...</div>}
+          {summaryError && <div>Error: {summaryError}</div>}
+          {summary && <ReactMarkdown>{summary}</ReactMarkdown>}
         </Box>
         <Stack direction={"row"} spacing={1} alignItems={"center"}>
           <TextField
@@ -81,8 +141,13 @@ function ChatScreen() {
             multiline
             maxRows={4}
             onChange={handleChange}
+            value={prompt}
           />
-          <Button variant="contained" onClick={handleClick}>
+          <Button 
+            variant="contained" 
+            onClick={handleClick}
+            disabled={summaryLoading}
+          >
             ?
           </Button>
         </Stack>
